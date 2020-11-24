@@ -10,12 +10,19 @@ namespace lib
         static ITelegramBotClient botClient;
         static async public void send(News news){
             string token = ConfigurationManager.AppSettings["TelegramBot"];
-            string chat_Id = ConfigurationManager.AppSettings["chatId"];
+            string[] chat_Id = ConfigurationManager.AppSettings["chatId"].Split(',');
             botClient = new TelegramBotClient(token);
-            await botClient.SendTextMessageAsync(
-                        chatId: chat_Id, // or a chat id: 123456789
+            try{
+                for(int i=0; i < chat_Id.Length; i++){
+                    await botClient.SendTextMessageAsync(
+                        chatId: chat_Id[i],
                         text: String.Format("{0}", news.url)
                     );
+                }
+            }
+            catch(Exception ex){
+                Console.WriteLine("{0}", ex.ToString());
+            }
         }
 
         //
@@ -43,7 +50,6 @@ namespace lib
                     {
                         tempList = rss.getNews(reader["rssURL"].ToString());
                         newsdata.AddRange(tempList);
-                        
                     }
                 }
             }
